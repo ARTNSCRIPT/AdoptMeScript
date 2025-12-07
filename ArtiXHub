@@ -1,6 +1,5 @@
 -- 1️⃣ Личный скрипт
--- сюда вставляешь свой код
--- loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
+loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()  -- сюда вставляешь свой основной код
 
 -- 2️⃣ Загрузочный экран
 local TweenService = game:GetService("TweenService")
