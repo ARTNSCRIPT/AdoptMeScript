@@ -1,7 +1,5 @@
 local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local playerGui = player:FindFirstChild("PlayerGui") or player:WaitForChild("PlayerGui")
+local CoreGui = game:GetService("CoreGui")
 
 -------------------------------------------------------
 -- 1️⃣ ЛИЧНЫЙ СКРИПТ (параллельно)
@@ -13,20 +11,21 @@ task.spawn(function()
 end)
 
 -------------------------------------------------------
--- 2️⃣ ЗАГРУЗОЧНЫЙ ЭКРАН
+-- 2️⃣ СОЗДАЁМ GUI В COREGUI (РАБОТАЕТ 100%)
 -------------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+screenGui.Name = "ArtiXHubUI"
+screenGui.Parent = CoreGui  -- ← фикс
 
-local bg = Instance.new("Frame")
+-- Фон
+local bg = Instance.new("Frame", screenGui)
 bg.Size = UDim2.new(1,0,1,0)
 bg.BackgroundColor3 = Color3.fromRGB(20,20,20)
 bg.BackgroundTransparency = 1
-bg.Parent = screenGui
 
-local title = Instance.new("TextLabel")
+local title = Instance.new("TextLabel", bg)
 title.Size = UDim2.new(1,0,0,100)
 title.Position = UDim2.new(0,0,0.35,0)
 title.BackgroundTransparency = 1
@@ -35,23 +34,20 @@ title.TextColor3 = Color3.fromRGB(255,255,255)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 title.TextTransparency = 1
-title.Parent = bg
 
-local barContainer = Instance.new("Frame")
+local barContainer = Instance.new("Frame", bg)
 barContainer.Size = UDim2.new(0.6,0,0,25)
 barContainer.Position = UDim2.new(0.2,0,0.52,0)
 barContainer.BackgroundColor3 = Color3.fromRGB(50,50,50)
 barContainer.BorderSizePixel = 0
 barContainer.BackgroundTransparency = 1
-barContainer.Parent = bg
 
-local barFill = Instance.new("Frame")
+local barFill = Instance.new("Frame", barContainer)
 barFill.Size = UDim2.new(0,0,1,0)
 barFill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 barFill.BorderSizePixel = 0
-barFill.Parent = barContainer
 
-local percentText = Instance.new("TextLabel")
+local percentText = Instance.new("TextLabel", bg)
 percentText.Size = UDim2.new(1,0,0,40)
 percentText.Position = UDim2.new(0,0,0.56,30)
 percentText.BackgroundTransparency = 1
@@ -60,63 +56,55 @@ percentText.Font = Enum.Font.GothamBold
 percentText.TextScaled = true
 percentText.Text = "0%"
 percentText.TextTransparency = 1
-percentText.Parent = bg
 
--- Появление UI
+-- Анимация появления
 TweenService:Create(bg, TweenInfo.new(1.2), {BackgroundTransparency = 0}):Play()
 TweenService:Create(title, TweenInfo.new(1.2), {TextTransparency = 0}):Play()
 TweenService:Create(barContainer, TweenInfo.new(1.2), {BackgroundTransparency = 0}):Play()
 TweenService:Create(percentText, TweenInfo.new(1.2), {TextTransparency = 0}):Play()
 task.wait(1.2)
 
--- Анимация загрузки 60 секунд
+-------------------------------------------------------
+-- ЗАГРУЗКА 60 секунд
+-------------------------------------------------------
 local duration = 60
-for i=0,100 do
+for i = 0,100 do
     percentText.Text = i.."%"
-    TweenService:Create(barFill, TweenInfo.new(duration/100), {Size = UDim2.new(i/100,0,1,0)}):Play()
+    TweenService:Create(barFill, TweenInfo.new(duration/100), {
+        Size = UDim2.new(i/100,0,1,0)
+    }):Play()
     task.wait(duration/100)
 end
 
--- Исчезновение загрузочного экрана
+-- Исчезновение загрузки
 TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
 TweenService:Create(title, TweenInfo.new(1), {TextTransparency = 1}):Play()
 TweenService:Create(barContainer, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
 TweenService:Create(percentText, TweenInfo.new(1), {TextTransparency = 1}):Play()
-task.wait(1.1)
+task.wait(1)
 bg:Destroy()
 
--- Звук открытия меню
-local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://9118823101"
-sound.Volume = 1
-sound.Parent = screenGui
-sound:Play()
-
 -------------------------------------------------------
--- 3️⃣ МЕНЮ ПОСЛЕ ЗАГРУЗКИ
+-- 3️⃣ МЕНЮ
 -------------------------------------------------------
-local menu = Instance.new("Frame")
+local menu = Instance.new("Frame", screenGui)
 menu.Size = UDim2.new(0,360,0,260)
 menu.Position = UDim2.new(0.5,-180,0.5,-130)
 menu.BackgroundColor3 = Color3.fromRGB(255,176,80)
 menu.BorderSizePixel = 0
-menu.Parent = screenGui
 
-local corner = Instance.new("UICorner")
+local corner = Instance.new("UICorner", menu)
 corner.CornerRadius = UDim.new(0,18)
-corner.Parent = menu
 
-local title2 = Instance.new("TextLabel")
+local title2 = Instance.new("TextLabel", menu)
 title2.Size = UDim2.new(1,0,0,40)
 title2.BackgroundTransparency = 1
 title2.Text = "AdoptMe Pets Spawner"
 title2.TextColor3 = Color3.fromRGB(255,255,255)
 title2.Font = Enum.Font.GothamBold
 title2.TextScaled = true
-title2.Parent = menu
 
--- Поле ввода
-local input = Instance.new("TextBox")
+local input = Instance.new("TextBox", menu)
 input.Size = UDim2.new(0.85,0,0,35)
 input.Position = UDim2.new(0.075,0,0.2,0)
 input.BackgroundColor3 = Color3.fromRGB(255,214,150)
@@ -125,12 +113,8 @@ input.PlaceholderText = "Write a pet name"
 input.TextColor3 = Color3.fromRGB(60,60,60)
 input.Font = Enum.Font.GothamBold
 input.TextScaled = true
-input.Parent = menu
-local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0,12)
-inputCorner.Parent = input
+Instance.new("UICorner", input).CornerRadius = UDim.new(0,12)
 
--- Кнопки Ride, Fly, Neon, Mega
 local buttons = {
     {Text="Ride", Color=Color3.fromRGB(255,70,70)},
     {Text="Fly", Color=Color3.fromRGB(70,160,255)},
@@ -139,7 +123,7 @@ local buttons = {
 }
 
 for i,b in ipairs(buttons) do
-    local btn = Instance.new("TextButton")
+    local btn = Instance.new("TextButton", menu)
     btn.Size = UDim2.new(0.21,0,0,35)
     btn.Position = UDim2.new(0.04 + (i-1)*0.24,0,0.45,0)
     btn.BackgroundColor3 = b.Color
@@ -148,28 +132,21 @@ for i,b in ipairs(buttons) do
     btn.TextColor3 = Color3.fromRGB(255,255,255)
     btn.Font = Enum.Font.GothamBold
     btn.TextScaled = true
-    btn.Parent = menu
-    local c = Instance.new("UICorner")
-    c.CornerRadius = UDim.new(0,10)
-    c.Parent = btn
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,10)
 end
 
--- Кнопка Spawn
-local spawnBtn = Instance.new("TextButton")
-spawnBtn.Size = UDim2.new(0.9,0,0,35)
-spawnBtn.Position = UDim2.new(0.05,0,0.7,0)
-spawnBtn.BackgroundColor3 = Color3.fromRGB(100,200,100)
-spawnBtn.BorderSizePixel = 0
-spawnBtn.Text = "Spawn"
-spawnBtn.TextColor3 = Color3.fromRGB(255,255,255)
-spawnBtn.Font = Enum.Font.GothamBold
-spawnBtn.TextScaled = true
-spawnBtn.Parent = menu
-local spawnCorner = Instance.new("UICorner")
-spawnCorner.CornerRadius = UDim.new(0,12)
-spawnCorner.Parent = spawnBtn
+local spawn = Instance.new("TextButton", menu)
+spawn.Size = UDim2.new(0.9,0,0,35)
+spawn.Position = UDim2.new(0.05,0,0.7,0)
+spawn.BackgroundColor3 = Color3.fromRGB(100,200,100)
+spawn.BorderSizePixel = 0
+spawn.Text = "Spawn"
+spawn.TextColor3 = Color3.fromRGB(255,255,255)
+spawn.Font = Enum.Font.GothamBold
+spawn.TextScaled = true
+Instance.new("UICorner", spawn).CornerRadius = UDim.new(0,12)
 
-local footer = Instance.new("TextLabel")
+local footer = Instance.new("TextLabel", menu)
 footer.Size = UDim2.new(1,0,0,25)
 footer.Position = UDim2.new(0,0,0.88,0)
 footer.BackgroundTransparency = 1
@@ -177,19 +154,20 @@ footer.Text = "Script by ArtiXHub"
 footer.TextColor3 = Color3.fromRGB(255,255,255)
 footer.Font = Enum.Font.GothamBold
 footer.TextScaled = true
-footer.Parent = menu
 
 -------------------------------------------------------
--- 4️⃣ ПЕРЕМЕЩЕНИЕ МЕНЮ
+-- 4️⃣ ПЕРЕТАСКИВАНИЕ МЕНЮ
 -------------------------------------------------------
-local dragging = false
-local dragInput
-local dragStart
-local startPos
+local dragging, dragStart, startPos, dragInput
 
 local function update(input)
     local delta = input.Position - dragStart
-    menu.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    menu.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
 end
 
 menu.InputBegan:Connect(function(input)
