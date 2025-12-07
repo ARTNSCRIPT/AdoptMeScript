@@ -1,5 +1,6 @@
 -- 1️⃣ Личный скрипт
-loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()  -- сюда вставляешь свой основной код
+-- сюда вставляешь свой код
+-- loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
 
 -- 2️⃣ Загрузочный экран
 local TweenService = game:GetService("TweenService")
@@ -89,10 +90,10 @@ sound.Volume = 1
 sound.Parent = screenGui
 sound:Play()
 
--- 3️⃣ Меню после загрузки
+-- 3️⃣ Меню после загрузки (уменьшенное и перетаскиваемое)
 local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0,400,0,300)
-menu.Position = UDim2.new(0.5,-200,0.5,-150)
+menu.Size = UDim2.new(0,300,0,250) -- меньшее окно
+menu.Position = UDim2.new(0.5,-150,0.5,-125)
 menu.BackgroundColor3 = Color3.fromRGB(255,176,80)
 menu.BorderSizePixel = 0
 menu.Parent = screenGui
@@ -115,7 +116,7 @@ title2.Parent = menu
 -- Поле ввода
 local input = Instance.new("TextBox")
 input.Size = UDim2.new(0.85,0,0,40)
-input.Position = UDim2.new(0.075,0,0.25,0)
+input.Position = UDim2.new(0.075,0,0.2,0)
 input.BackgroundColor3 = Color3.fromRGB(255,214,150)
 input.BorderSizePixel = 0
 input.PlaceholderText = "Write a pet name"
@@ -137,8 +138,8 @@ local buttons = {
 
 for i,b in ipairs(buttons) do
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.21,0,0,40)
-    btn.Position = UDim2.new(0.04 + (i-1)*0.24,0,0.5,0)
+    btn.Size = UDim2.new(0.21,0,0,35)
+    btn.Position = UDim2.new(0.04 + (i-1)*0.23,0,0.5,0)
     btn.BackgroundColor3 = b.Color
     btn.BorderSizePixel = 0
     btn.Text = b.Text
@@ -153,7 +154,7 @@ end
 
 -- Кнопка Spawn
 local spawnBtn = Instance.new("TextButton")
-spawnBtn.Size = UDim2.new(0.9,0,0,40)
+spawnBtn.Size = UDim2.new(0.9,0,0,35)
 spawnBtn.Position = UDim2.new(0.05,0,0.7,0)
 spawnBtn.BackgroundColor3 = Color3.fromRGB(100,200,100)
 spawnBtn.BorderSizePixel = 0
@@ -168,7 +169,7 @@ spawnCorner.Parent = spawnBtn
 
 -- Подпись
 local footer = Instance.new("TextLabel")
-footer.Size = UDim2.new(1,0,0,30)
+footer.Size = UDim2.new(1,0,0,25)
 footer.Position = UDim2.new(0,0,0.88,0)
 footer.BackgroundTransparency = 1
 footer.Text = "Script by ArtiXHub"
@@ -176,3 +177,32 @@ footer.TextColor3 = Color3.fromRGB(255,255,255)
 footer.Font = Enum.Font.GothamBold
 footer.TextScaled = true
 footer.Parent = menu
+
+-- 🌟 Перетаскивание окна касанием
+local dragging, dragInput, dragStart, startPos
+
+menu.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = menu.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+menu.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        menu.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
