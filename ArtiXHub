@@ -58,14 +58,13 @@ uiGradient.Color = ColorSequence.new{
 uiGradient.Rotation = 45
 uiGradient.Parent = progressBar
 
--- Статусы загрузки
+-- Статусы загрузки (только твои)
 local statuses = {
     "Script is FE",
-    "Pet Spawner loaded",
-    "Syncing pets...",
-    "Applying textures...",
-    "Checking server...",
-    "Almost there...",
+    "Initializing Pet Spawner",
+    "Loading Assets...",
+    "Syncing Pets...",
+    "Applying Settings...",
     "Finalizing..."
 }
 
@@ -92,7 +91,7 @@ while tick() - startTime < totalTime do
     local scale = 1 + 0.05 * math.sin(tick() * 3)
     loadingText.TextSize = 24 * scale
     
-    -- Смена статусов каждые 12-15 секунд
+    -- Смена статусов равномерно по времени
     local statusIndex = math.floor(elapsed / (totalTime / #statuses)) + 1
     if statusIndex > #statuses then statusIndex = #statuses end
     statusText.Text = statuses[statusIndex]
