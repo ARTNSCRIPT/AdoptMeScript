@@ -1,4 +1,4 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ARTNSCRIPT/AdoptMeScript/refs/heads/main/ArtiXHub"))()
+loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
