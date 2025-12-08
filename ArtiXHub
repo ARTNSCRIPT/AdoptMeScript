@@ -58,24 +58,26 @@ uiGradient.Color = ColorSequence.new{
 uiGradient.Rotation = 45
 uiGradient.Parent = progressBar
 
--- Подсказки
-local tips = {
-    "Tip: Pet your virtual pets!",
-    "Tip: Rare pets spawn randomly!",
-    "Tip: Combine pets for surprises!",
-    "Tip: You can trade pets with friends!",
-    "Tip: Keep an eye on daily rewards!"
+-- Статусы загрузки
+local statuses = {
+    "Script is FE",
+    "Pet Spawner loaded",
+    "Syncing pets...",
+    "Applying textures...",
+    "Checking server...",
+    "Almost there...",
+    "Finalizing..."
 }
 
-local tipText = Instance.new("TextLabel")
-tipText.Size = UDim2.new(0.6, 0, 0.05, 0)
-tipText.Position = UDim2.new(0.2, 0, 0.6, 0)
-tipText.Text = tips[1]
-tipText.TextScaled = true
-tipText.BackgroundTransparency = 1
-tipText.TextColor3 = Color3.fromRGB(255, 255, 255)
-tipText.Font = Enum.Font.ArialBold
-tipText.Parent = background
+local statusText = Instance.new("TextLabel")
+statusText.Size = UDim2.new(0.6, 0, 0.05, 0)
+statusText.Position = UDim2.new(0.2, 0, 0.6, 0)
+statusText.Text = statuses[1]
+statusText.TextScaled = true
+statusText.BackgroundTransparency = 1
+statusText.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusText.Font = Enum.Font.ArialBold
+statusText.Parent = background
 
 -- Анимация прогресса
 local totalTime = 90
@@ -90,14 +92,16 @@ while tick() - startTime < totalTime do
     local scale = 1 + 0.05 * math.sin(tick() * 3)
     loadingText.TextSize = 24 * scale
     
-    -- Смена подсказок каждые 10 секунд
-    local tipIndex = math.floor(elapsed / 10) % #tips + 1
-    tipText.Text = tips[tipIndex]
+    -- Смена статусов каждые 12-15 секунд
+    local statusIndex = math.floor(elapsed / (totalTime / #statuses)) + 1
+    if statusIndex > #statuses then statusIndex = #statuses end
+    statusText.Text = statuses[statusIndex]
     
     wait(0.03) -- плавная анимация
 end
 
 progressBar.Size = UDim2.new(1, 0, 1, 0)
 loadingText.Text = "Loaded!"
+statusText.Text = "Ready!"
 wait(1)
 screenGui:Destroy()
