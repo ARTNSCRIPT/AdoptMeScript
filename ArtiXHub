@@ -1,89 +1,103 @@
--- === Настройки ===
-local TOTAL_TIME = 90
-local STEPS = 100
 local player = game.Players.LocalPlayer
-local gui = script.Parent
-local frame = gui:WaitForChild("MainFrame")
-local title = frame:WaitForChild("Title")
-local loadingText = frame:WaitForChild("LoadingText")
-local barFill = frame:WaitForChild("BarFill")
-local scale = barFill:FindFirstChild("UIScale")
-local gradient = barFill:FindFirstChild("UIGradient")
+local playerGui = player:WaitForChild("PlayerGui")
 
--- === Начальное состояние GUI ===
-gui.Enabled = true
-barFill.Size = UDim2.new(0,0,1,0)
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LoadingScreen"
+screenGui.Parent = playerGui
+
+-- Фон
+local background = Instance.new("Frame")
+background.Size = UDim2.new(1, 0, 1, 0)
+background.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+background.Parent = screenGui
+
+-- Название
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0.6, 0, 0.1, 0)
+title.Position = UDim2.new(0.2, 0, 0.25, 0)
+title.Text = "AdoptMe Pet Spawner"
+title.TextScaled = true
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.Bangers
+title.Parent = background
+
+-- Loading текст
+local loadingText = Instance.new("TextLabel")
+loadingText.Size = UDim2.new(0.3, 0, 0.05, 0)
+loadingText.Position = UDim2.new(0.35, 0, 0.37, 0)
 loadingText.Text = "Loading..."
+loadingText.TextScaled = true
+loadingText.BackgroundTransparency = 1
+loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingText.Font = Enum.Font.Bangers
+loadingText.Parent = background
 
--- === Анимации GUI ===
--- Пульсация заголовка
-task.spawn(function()
-    while gui.Enabled do
-        title.TextSize = title.TextSize + 2
-        task.wait(0.2)
-        title.TextSize = title.TextSize - 2
-        task.wait(0.2)
-    end
-end)
+-- Прогрессбар фон
+local progressBarBackground = Instance.new("Frame")
+progressBarBackground.Size = UDim2.new(0.6, 0, 0.05, 0)
+progressBarBackground.Position = UDim2.new(0.2, 0, 0.5, 0)
+progressBarBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+progressBarBackground.BorderSizePixel = 0
+progressBarBackground.Parent = background
 
--- Мигающие точки "Loading..."
-task.spawn(function()
-    local dots = 0
-    while gui.Enabled do
-        dots = (dots + 1) % 4
-        loadingText.Text = "Loading" .. string.rep(".", dots)
-        task.wait(0.4)
-    end
-end)
+-- Прогрессбар (градиент)
+local progressBar = Instance.new("Frame")
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+progressBar.BorderSizePixel = 0
+progressBar.Parent = progressBarBackground
 
--- Вращающийся градиент полосы
-task.spawn(function()
-    while gui.Enabled do
-        if gradient then
-            gradient.Rotation = gradient.Rotation + 1
-        end
-        task.wait(0.02)
-    end
-end)
+local uiGradient = Instance.new("UIGradient")
+uiGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 150, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
+}
+uiGradient.Rotation = 45
+uiGradient.Parent = progressBar
 
--- Дыхание прогресс-бара
-task.spawn(function()
-    while gui.Enabled do
-        if scale then
-            scale.Scale = 1.03
-            task.wait(0.4)
-            scale.Scale = 1
-            task.wait(0.4)
-        end
-    end
-end)
+-- Подсказки
+local tips = {
+    "Tip: Pet your virtual pets!",
+    "Tip: Rare pets spawn randomly!",
+    "Tip: Combine pets for surprises!",
+    "Tip: You can trade pets with friends!",
+    "Tip: Keep an eye on daily rewards!"
+}
 
--- === Параллельный запуск твоего скрипта ===
-local loadDone = false
-task.spawn(function()
-    loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
-    loadDone = true
-end)
+local tipText = Instance.new("TextLabel")
+tipText.Size = UDim2.new(0.6, 0, 0.05, 0)
+tipText.Position = UDim2.new(0.2, 0, 0.6, 0)
+tipText.Text = tips[1]
+tipText.TextScaled = true
+tipText.BackgroundTransparency = 1
+tipText.TextColor3 = Color3.fromRGB(255, 255, 255)
+tipText.Font = Enum.Font.ArialBold
+tipText.Parent = background
 
--- === Основной цикл прогресс-бара ===
-local timePerStep = TOTAL_TIME / STEPS
-for i = 1, STEPS do
-    barFill.Size = UDim2.new(i / 100, 0, 1, 0)
+-- Анимация прогресса
+local totalTime = 90
+local startTime = tick()
+
+while tick() - startTime < totalTime do
+    local elapsed = tick() - startTime
+    local progress = elapsed / totalTime
+    progressBar.Size = UDim2.new(progress, 0, 1, 0)
     
-    -- Если твой скрипт завершился раньше, ускоряем оставшуюся загрузку
-    if loadDone and i < STEPS then
-        -- Остаток до 100% заполняем быстро
-        for j = i+1, STEPS do
-            barFill.Size = UDim2.new(j / 100, 0, 1, 0)
-            task.wait(0.02)
-        end
-        break
-    end
+    -- Пульсация текста
+    local scale = 1 + 0.05 * math.sin(tick() * 3)
+    loadingText.TextSize = 24 * scale
     
-    task.wait(timePerStep)
+    -- Смена подсказок каждые 10 секунд
+    local tipIndex = math.floor(elapsed / 10) % #tips + 1
+    tipText.Text = tips[tipIndex]
+    
+    wait(0.03) -- плавная анимация
 end
 
--- === Финальное состояние ===
-loadingText.Text = "Ready!"
-task.wait(0.5)
-gui.Enabled = false
+progressBar.Size = UDim2.new(1, 0, 1, 0)
+loadingText.Text = "Loaded!"
+wait(1)
+screenGui:Destroy()
